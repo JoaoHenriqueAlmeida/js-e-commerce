@@ -1,3 +1,35 @@
+function getSkuFromProductItem(item) {
+  return item.querySelector('span.item__sku').innerText;
+}
+
+function cartItemClickListener(event) {
+  // coloque seu código aqui
+}
+
+function createCartItemElement({ id, title, price }) {
+  const li = document.createElement('li');
+  li.className = 'cart__item';
+  li.innerText = `SKU: ${id} | NAME: ${title} | PRICE: $${price}`;
+  li.addEventListener('click', cartItemClickListener);
+  return li;
+}
+
+function addItensToCart(event) {
+  const cartItems = document.querySelector('.cart__items');
+
+  const bttnParentSection = event.target.parentElement;
+
+  const elementId = getSkuFromProductItem(bttnParentSection);
+  return fetch(`https://api.mercadolibre.com/items/${elementId}`)
+  .then((response) => response.json())
+  .then((jsonObj) => cartItems.appendChild(createCartItemElement(jsonObj)));
+}
+
+function activateEventListener() {
+  const addToCartButtons = document.querySelectorAll('.item__add');
+  addToCartButtons.forEach((button) => button.addEventListener('click', addItensToCart));
+}
+
 function createProductImageElement(imageSource) {
   const img = document.createElement('img');
   img.className = 'item__image';
@@ -21,26 +53,10 @@ function createProductItemElement({ sku, name, image }) {
   section.appendChild(createCustomElement('span', 'item__title', name));
   section.appendChild(createProductImageElement(image));
   section.appendChild(createCustomElement('button', 'item__add', 'Adicionar ao carrinho!'));
-
+  activateEventListener();
   return itemsContainer.appendChild(section);
 }
-
-function getSkuFromProductItem(item) {
-  return item.querySelector('span.item__sku').innerText;
-}
-
-function cartItemClickListener(event) {
-  // coloque seu código aqui
-}
-
-function createCartItemElement({ sku, name, salePrice }) {
-  const li = document.createElement('li');
-  li.className = 'cart__item';
-  li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
-  li.addEventListener('click', cartItemClickListener);
-  return li;
-}
-
+// Ajuda do Luiz Gustavo e do Victor Martins
 const results = (info) => {
   const result = info.results;
   const newArray = result.map(({ id, title, thumbnail }) => {
@@ -53,7 +69,6 @@ const results = (info) => {
   });
   console.log(newArray);
   return newArray.forEach((element) => createProductItemElement(element));
-  // return createProductItemElement(newArray);
 };
 
 const fetchAllItens = async () => {
