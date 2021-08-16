@@ -48,6 +48,11 @@ function createCustomElement(element, className, innerText) {
   return e;
 }
 
+const removeLoading = () => {
+  const loadingTxt = document.querySelector('.loading');
+  loadingTxt.parentElement.removeChild(loadingTxt);
+};
+
 function createProductItemElement({ sku, name, image }) {
   const itemsContainer = document.querySelector('.items');
   const section = document.createElement('section');
@@ -58,21 +63,18 @@ function createProductItemElement({ sku, name, image }) {
   section.appendChild(createProductImageElement(image));
   section.appendChild(createCustomElement('button', 'item__add', 'Adicionar ao carrinho!'));
   activateEventListener();
-  return itemsContainer.appendChild(section);
+  itemsContainer.appendChild(section);
 }
 
 // Ajuda do Luiz Gustavo e do Victor Martins no requisito 1
 const results = (info) => {
   const result = info.results;
-  const newArray = result.map(({ id, title, thumbnail }) => {
-    const element = {
+  const newArray = result.map(({ id, title, thumbnail }) => ({
       sku: id,
       name: title,
       image: thumbnail,
-    };
-    return element;
-  });
-  console.log(newArray);
+    }));
+    removeLoading();
   return newArray.forEach((element) => createProductItemElement(element));
 };
 
