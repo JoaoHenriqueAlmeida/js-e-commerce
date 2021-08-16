@@ -8,8 +8,15 @@ function storingCart() {
   localStorage.setItem('Cart', itensCart.innerHTML);
 }
 
+let sumOfPrices = 0;
+const totalPrice = document.querySelector('.total-price');
+
 function cartItemClickListener(event) {
-  event.target.parentElement.removeChild(event.target);
+  const targetPrice = parseFloat(event.target.innerText.split('$')[1]);
+  sumOfPrices -= targetPrice;
+  totalPrice.innerText = sumOfPrices;
+  event.target.remove();
+  localStorage.setItem('preço', totalPrice.innerText);
 }
 
 function createCartItemElement({ id, title, price }) {
@@ -19,6 +26,10 @@ function createCartItemElement({ id, title, price }) {
   li.addEventListener('click', cartItemClickListener);
   itensCart.appendChild(li);
   storingCart();
+
+  sumOfPrices += price;
+  totalPrice.innerText = sumOfPrices;
+  localStorage.setItem('preço', totalPrice.innerText);
 }
 
 function addItensToCart(event) {
@@ -88,9 +99,16 @@ const fetchAllItens = async () => {
   }
 };
 
+function resetStoragePrice() {
+  totalPrice.innerText = 0;
+  sumOfPrices = 0;
+  localStorage.setItem('preço', 0);
+}
+
 function clearCart() {
   itensCart.innerHTML = '';
   storingCart();
+  resetStoragePrice();
 }
 
 const clearBttn = document.querySelector('.empty-cart');
@@ -101,4 +119,6 @@ window.onload = () => {
   itensCart.innerHTML = (localStorage.getItem('Cart'));
   const li = document.querySelectorAll('.cart__item');
   li.forEach((iten) => iten.addEventListener('click', cartItemClickListener));
+  const recoveredPrice = localStorage.getItem('preço');
+  totalPrice.innerHTML = recoveredPrice;
 };
