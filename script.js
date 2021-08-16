@@ -2,6 +2,12 @@ function getSkuFromProductItem(item) {
   return item.querySelector('span.item__sku').innerText;
 }
 
+const itensCart = document.querySelector('.cart__items');
+
+function storingCart() {
+  localStorage.setItem('Cart', itensCart.innerHTML);
+}
+
 function cartItemClickListener(event) {
   event.target.parentElement.removeChild(event.target);
 }
@@ -11,18 +17,17 @@ function createCartItemElement({ id, title, price }) {
   li.className = 'cart__item';
   li.innerText = `SKU: ${id} | NAME: ${title} | PRICE: $${price}`;
   li.addEventListener('click', cartItemClickListener);
-  return li;
+  itensCart.appendChild(li);
+  storingCart();
 }
 
 function addItensToCart(event) {
-  const cartItems = document.querySelector('.cart__items');
-
   const bttnParentSection = event.target.parentElement;
 
   const elementId = getSkuFromProductItem(bttnParentSection);
   return fetch(`https://api.mercadolibre.com/items/${elementId}`)
   .then((response) => response.json())
-  .then((jsonObj) => cartItems.appendChild(createCartItemElement(jsonObj)));
+  .then((jsonObj) => (createCartItemElement(jsonObj)));
 }
 
 function activateEventListener() {
@@ -56,7 +61,8 @@ function createProductItemElement({ sku, name, image }) {
   activateEventListener();
   return itemsContainer.appendChild(section);
 }
-// Ajuda do Luiz Gustavo e do Victor Martins
+
+// Ajuda do Luiz Gustavo e do Victor Martins no requisito 1
 const results = (info) => {
   const result = info.results;
   const newArray = result.map(({ id, title, thumbnail }) => {
@@ -83,4 +89,7 @@ const fetchAllItens = async () => {
 
 window.onload = () => {
   fetchAllItens();
+  itensCart.innerHTML = (localStorage.getItem('Cart'));
+  const li = document.querySelectorAll('.cart__item');
+  li.forEach((iten) => iten.addEventListener('click', cartItemClickListener));
 };
